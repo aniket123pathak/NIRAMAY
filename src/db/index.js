@@ -7,7 +7,7 @@ const connectDB = async () => {
         //console.log(connectionInstance);
         console.log(`DataBase connnected Successfully....!!! || HOST : ${connectionInstance.connection.host}`);
     } catch (error) {
-        console.log("Connection with the DataBase is failed!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        console.log("Connection with the DataBase is failed!!!!!!")
         console.log("Error : ",error);
         process.exit(1);
     }
