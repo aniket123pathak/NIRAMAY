@@ -1,0 +1,23 @@
+{
+  "name": "niramay",
+  "version": "1.0.0",
+  "description": "Hospital management",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aniket123pathak/NIRAMAY.git"
+  },
+  "author": "Aniket Pathak",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/aniket123pathak/NIRAMAY/issues"
+  },
+  "homepage": "https://github.com/aniket123pathak/NIRAMAY#readme",
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
