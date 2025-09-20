@@ -1,4 +1,5 @@
 import mongoose, { Schema } from "mongoose";
+import bcrypt from "bcrypt"
 
 const doctorSchema = new Schema(
   {
@@ -17,6 +18,11 @@ const doctorSchema = new Schema(
       unique: true,
       trim: true,
     },
+    phoneNo : {
+      type : String,
+      unique : true ,
+      required : true
+    },
     password: {
       type: String,
       required: true,
@@ -31,8 +37,15 @@ const doctorSchema = new Schema(
       type: String,
       required: true,
     },
+    specializations : {
+        type : [String],
+    },
+    qualification : {
+        type : [String],  
+    },
     experience: {
       type: Number,
+      default : 0
     },
     patient: [
       {
