@@ -1,6 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 import bcrypt from "bcrypt"
-
+import jwt from "jsonwebtoken"
 const doctorSchema = new Schema(
   {
     userName: {
@@ -40,7 +40,7 @@ const doctorSchema = new Schema(
     specializations : {
         type : [String],
     },
-    qualification : {
+    qualifications : {
         type : [String],  
     },
     experience: {
@@ -53,7 +53,7 @@ const doctorSchema = new Schema(
         ref: "Patient",
       },
     ],
-    refresh: {
+    refreshToken: {
       type: String,
     },
   },
@@ -61,5 +61,43 @@ const doctorSchema = new Schema(
     timestamps: true,
   }
 );
+
+doctorSchema.pre("save",async function (next){
+  if(!this.isModified("password")) return next();
+
+  this.password = await bcrypt.hash(this.password,10);
+  next();
+})
+
+doctorSchema.methods.isPasswordCorrect = async function (password){
+  return await bcrypt.compare(password,this.password);
+}
+
+doctorSchema.methods.generateAccessToken = async function() {
+  return jwt.sign(
+    {
+      _id : this._id,
+      email : this.email,
+      userName : this.userName,
+      fullName : this.fullName
+    },
+    process.env.ACCESS_TOKEN_SECRET,
+    {
+      expiresIn : ACCESS_TOKEN_EXPIRY
+    }
+  )
+}
+
+doctorSchema.methods.generateRefreshToken = async function() {
+  return jwt.sign(
+    {
+      _id : this._id,
+    },
+    process.env.REFRESH_TOKEN_SECRET,
+    {
+      expiresIn : REFRESH_TOKEN_EXPIRY
+    }
+  )
+}
 
 export const Doctor = mongoose.model("Doctor", doctorSchema);
