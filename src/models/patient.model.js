@@ -7,7 +7,7 @@ const patientSchema = new Schema(
       index: true,
       lowercase: true,
       required: true,
-      trim: true
+      trim: true,
     },
     address: {
       type: String,
@@ -30,23 +30,18 @@ const patientSchema = new Schema(
     dateOfBirth: {
       type: Date,
     },
-    weight: {
-      type: Number,
-    },
-    symptoms: {
-      type: [String],
-      lowercase: true,
-    },
     medicalHistory: {
       type: [String],
     },
+    visits: [{
+      type: Schema.Types.ObjectId,
+      ref: "Visit",
+      required: true,
+    }],
     assignedDoctor: {
-        type: Schema.Types.ObjectId,
-        ref: "Doctor",
-        required: true
-    },
-    reports: {
-      type: [String],
+      type: Schema.Types.ObjectId,
+      ref: "Doctor",
+      required: true,
     },
   },
   {
