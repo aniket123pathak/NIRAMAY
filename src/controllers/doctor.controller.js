@@ -4,6 +4,21 @@ import { apiError } from "../utils/apiError.js";
 import { apiResponse } from "../utils/apiResponse.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
+const generateAccessAndRefreshToken = async (doctorid) => {
+    try {
+        const doctor = await Doctor.findById(doctorid);
+        
+        const accessToken = await doctor.generateAccessToken()
+        const refreshToken = await doctor.generateRefreshToken()
+
+        doctor.refreshToken = refreshToken
+        await doctor.save({validateBeforeSave : false})
+        return {accessToken , refreshToken}
+    } catch (error) {
+        throw new apiError(500,"Something went worng while Generating the access and the refresh token")
+    }
+}
+
 const registerDoctor = asyncHandler(async (req, res) => {
   const {
     userName,
@@ -26,16 +41,16 @@ const registerDoctor = asyncHandler(async (req, res) => {
     throw new apiError(400, "Add Specialozation or qualification");
   }
 
-  const existedDoctor = await Doctor.findOne({
-    $or: [{ userName }, { email }, { phoneNo }],
-  });
-
   if (!/^\d{10}$/.test(phoneNo)) {
     throw new ApiError(
       400,
       "Phone number must be exactly 10 digits and contain no letters or symbols."
     );
   }
+
+  const existedDoctor = await Doctor.findOne({
+    $or: [{ userName }, { email }, { phoneNo }],
+  });
 
   if (existedDoctor) {
     throw new apiError(
@@ -81,4 +96,52 @@ const registerDoctor = asyncHandler(async (req, res) => {
     );
 });
 
-export { registerDoctor };
+const loginDoctor = asyncHandler(async(req,res)=>{
+    const { userName , email , password } = req.body 
+
+    if(!email && !userName){
+        throw new apiError(400 , "Enter Email or username")
+    }
+
+    const doctor = await Doctor.findOne({
+        $or : [{userName} , {email}]
+    })
+
+    if(!doctor){
+        throw new apiError(400,"Username or Email Does not Exist...")
+    }
+
+    const isPasswordValid = await doctor.isPasswordCorrect(password)
+
+    if(!isPasswordValid){
+        throw new apiError(400,"Invalid password")
+    }
+
+    const {accessToken , refreshToken} = await generateAccessAndRefreshToken(doctor._id)
+
+    const loggedInDoctor = await Doctor.findById(doctor._id).select("-password -refreshToken")
+
+    const options = {
+        httpOnly : true,
+        secure : true
+    }
+    
+    return res
+    .status(200)
+    .cookie("accessToken",accessToken,options)
+    .cookie("refreshToken",refreshToken,options)
+    .json(
+        new apiResponse(
+            200,
+            {
+                doctor : loggedInDoctor , accessToken , refreshToken
+            },
+            "User Logged in Successfully"
+        )
+    )
+})
+
+export { 
+    registerDoctor,
+    loginDoctor 
+};
