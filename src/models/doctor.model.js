@@ -1,6 +1,6 @@
 import mongoose, { Schema } from "mongoose";
-import bcrypt from "bcrypt"
-import jwt from "jsonwebtoken"
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 const doctorSchema = new Schema(
   {
     userName: {
@@ -18,10 +18,10 @@ const doctorSchema = new Schema(
       unique: true,
       trim: true,
     },
-    phoneNo : {
-      type : String,
-      unique : true ,
-      required : true
+    phoneNo: {
+      type: String,
+      unique: true,
+      required: true,
     },
     password: {
       type: String,
@@ -37,15 +37,75 @@ const doctorSchema = new Schema(
       type: String,
       required: true,
     },
-    specializations : {
-        type : [String],
+    specializations: {
+      type: [String],
+      enum: [
+        "General Physician",
+        "Family Medicine",
+        "Pediatrics",
+        "Geriatrics",
+        "Neurology",
+        "Cardiology",
+        "Pulmonology",
+        "Gastroenterology",
+        "Nephrology",
+        "Endocrinology",
+        "Rheumatology",
+        "Oncology",
+        "Hematology",
+        "Infectious Disease",
+        "General Surgery",
+        "Orthopedic Surgery",
+        "Neurosurgery",
+        "Cardiothoracic Surgery",
+        "Plastic & Reconstructive Surgery",
+        "Urology",
+        "ENT (Ear, Nose, Throat)",
+        "Ophthalmology",
+        "Gynecology",
+        "Obstetrics",
+        "Neonatology",
+        "Pediatric Surgery",
+        "Radiology",
+        "Pathology",
+        "Anesthesiology",
+        "Emergency Medicine",
+        "Dermatology",
+        "Psychiatry",
+        "Psychology",
+        "Dentistry",
+        "Physiotherapy",
+        "Sports Medicine",
+        "Nutrition & Dietetics",
+        "Occupational Medicine",
+      ],
     },
-    qualifications : {
-        type : [String],  
+    qualifications: {
+      type: [String],
+      enum: [
+        "MBBS",
+        "MD",
+        "MS",
+        "DM",
+        "MCh",
+        "BDS",
+        "MDS",
+        "BAMS",
+        "BHMS",
+        "BUMS",
+        "BSMS",
+        "BNYS",
+        "BPT",
+        "MPT",
+        "PhD (Medical)",
+        "DNB",
+        "Diploma in Clinical Medicine",
+        "Fellowship",
+      ],
     },
     experience: {
       type: Number,
-      default : 0
+      default: 0,
     },
     patient: [
       {
@@ -62,42 +122,42 @@ const doctorSchema = new Schema(
   }
 );
 
-doctorSchema.pre("save",async function (next){
-  if(!this.isModified("password")) return next();
+doctorSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
 
-  this.password = await bcrypt.hash(this.password,10);
+  this.password = await bcrypt.hash(this.password, 10);
   next();
-})
+});
 
-doctorSchema.methods.isPasswordCorrect = async function (password){
-  return await bcrypt.compare(password,this.password);
-}
+doctorSchema.methods.isPasswordCorrect = async function (password) {
+  return await bcrypt.compare(password, this.password);
+};
 
-doctorSchema.methods.generateAccessToken = async function() {
+doctorSchema.methods.generateAccessToken = async function () {
   return jwt.sign(
     {
-      _id : this._id,
-      email : this.email,
-      userName : this.userName,
-      fullName : this.fullName
+      _id: this._id,
+      email: this.email,
+      userName: this.userName,
+      fullName: this.fullName,
     },
     process.env.ACCESS_TOKEN_SECRET,
     {
-      expiresIn : ACCESS_TOKEN_EXPIRY
+      expiresIn: ACCESS_TOKEN_EXPIRY,
     }
-  )
-}
+  );
+};
 
-doctorSchema.methods.generateRefreshToken = async function() {
+doctorSchema.methods.generateRefreshToken = async function () {
   return jwt.sign(
     {
-      _id : this._id,
+      _id: this._id,
     },
     process.env.REFRESH_TOKEN_SECRET,
     {
-      expiresIn : REFRESH_TOKEN_EXPIRY
+      expiresIn: REFRESH_TOKEN_EXPIRY,
     }
-  )
-}
+  );
+};
 
 export const Doctor = mongoose.model("Doctor", doctorSchema);
