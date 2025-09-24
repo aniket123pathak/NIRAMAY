@@ -107,7 +107,7 @@ const doctorSchema = new Schema(
       type: Number,
       default: 0,
     },
-    patient: [
+    patients: [
       {
         type: Schema.Types.ObjectId,
         ref: "Patient",
