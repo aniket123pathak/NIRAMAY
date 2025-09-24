@@ -23,7 +23,9 @@ app.use(cookieParser())
 
 //import rotes
 import doctorRouter from "./routes/doctor.routes.js"
+import patientRouter from "./routes/patient.routes.js"
 
 app.use("/api/v1/doctors",doctorRouter)
+app.use("/api/v1/patients",patientRouter)
 
 export { app }
