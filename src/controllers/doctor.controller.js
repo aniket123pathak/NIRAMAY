@@ -162,7 +162,7 @@ const logoutDoctor = asyncHandler(async(req,res)=>{
     return res
     .status(200)
     .clearCookie("accessToken",options)
-    .clearCookiecookie("refreshToken",options)
+    .clearCookie("refreshToken",options)
     .json(
         new apiResponse(200,{}, "User Logged out Successfully")
     )

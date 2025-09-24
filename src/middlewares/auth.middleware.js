@@ -5,7 +5,7 @@ import { Doctor } from "../models/doctor.model.js";
 
 export const verifyJWT = asyncHandler(async (req,_,next)=>{
     try {
-        const token = await req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ","")
+        const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ","")
         if(!token){
             throw new apiError(404,"Unauthorised Request")
         } 
