@@ -141,7 +141,37 @@ const loginDoctor = asyncHandler(async(req,res)=>{
     )
 })
 
+const logoutDoctor = asyncHandler(async(req,res)=>{
+    await Doctor.findByIdAndUpdate(
+      req.doctor._id,
+      {
+        $set : {
+          refreshToken : undefined
+        }
+      },
+      {
+        new : true
+      }
+    )
+
+    const options = {
+        httpOnly : true,
+        secure : true
+    }
+
+    return res
+    .status(200)
+    .clearCookie("accessToken",options)
+    .clearCookiecookie("refreshToken",options)
+    .json(
+        new apiResponse(200,{}, "User Logged out Successfully")
+    )
+})
+
+
+
 export { 
     registerDoctor,
-    loginDoctor 
+    loginDoctor,
+    logoutDoctor
 };
