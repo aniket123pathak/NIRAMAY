@@ -7,21 +7,26 @@ import { apiResponse } from "../utils/apiResponse.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 const createVisit = asyncHandler(async (req,res)=>{
-    const { userName , symptoms , dateOfVisit , medicine , bill} = req.body
+    const { patientId , symptoms , dateOfVisit , medicine , bill} = req.body
 
     if(
-        [userName , symptoms , dateOfVisit , medicine].some((field)=>field?.trim()==="")
+        [patientId , symptoms , dateOfVisit , medicine].some((field)=>field?.trim()==="")
     ){
         throw new apiError(400,"Every field is required")
     }
 
+    const patient = await Patient.findById(patientId);
+
+    if(!patient){
+        throw new apiError(400,"Patient does not Exist")
+    }
+
     const visit = await Visit.create({
-        userName,
+        patientId,
         symptoms,
         dateOfVisit,
         medicine,
         bill,
-        patient : req.patient._id
     })
 
     if(!visit){
@@ -31,7 +36,7 @@ const createVisit = asyncHandler(async (req,res)=>{
     const createdVisit = await Visit.findById(visit._id)
 
     await Patient.findByIdAndUpdate(
-        req.patient._id,
+        patientId,
         {
             $push : {
                 visits :  createdVisit._id
