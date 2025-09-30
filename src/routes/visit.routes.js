@@ -5,6 +5,10 @@ import { verifyJWT } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
-router.route("/createVisit").post(verifyJWT,createVisit)
+router.route("/createVisit").post(
+    verifyJWT,
+    upload.array('reports',5),
+    createVisit
+)
 
 export {router}

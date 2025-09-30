@@ -23,9 +23,21 @@ const createVisit = asyncHandler(async (req, res) => {
     throw new apiError(400, "Patient does not Exist");
   }
 
+  const reportsGot= [];
+  
+  if(req.files && req.files.length>0){
+    for(let file in req.files){
+        const report = await uploadOnCloudinary(file.path)
+        if(report && report.url){
+            reportsGot.push(report.url)
+        }
+    }
+  }
+
   const visit = await Visit.create({
     patientId,
     symptoms,
+    reports : reportsGot,
     dateOfVisit,
     medicine,
     bill,
@@ -48,7 +60,7 @@ const createVisit = asyncHandler(async (req, res) => {
 
   return res
     .status(201)
-    .jsos(new apiResponse(201, createdVisit, "Visit added Successfully"));
+    .json(new apiResponse(201, createdVisit, "Visit added Successfully"));
 });
 
 export { createVisit };
